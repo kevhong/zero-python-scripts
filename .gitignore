@@ -93,3 +93,6 @@ ENV/
 
 # DS stores
 .DS_Store
+
+# Png graphs
+*.png
