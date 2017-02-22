@@ -30,6 +30,7 @@ def _convert_file (fn):
         if (len(v) > 1):
             out_string = k + "," + reduce(lambda x, y: x + "," + y, v)  + "\n"
             output_file.write(out_string)
+    print len(out)
     output_file.close()
 
 
