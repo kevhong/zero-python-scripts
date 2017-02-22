@@ -25,7 +25,7 @@ def get_times_hist (fn, get_leaf = True):
     fig = plt.figure()
     ax = fig.add_subplot(111)
     ax.hist(times, bins=[0, 25, 50, 100, 250, 500, 1000])
-    plt.savefig(("leaf_page" if get_leaf else "node_page") + "_hist.png")
+    plt.savefig("outputs/" + ("leaf_page" if get_leaf else "node_page") + "_hist.png")
 
 
 if __name__ == '__main__':

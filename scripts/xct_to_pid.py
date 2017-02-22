@@ -24,7 +24,7 @@ def _convert_file (fn):
 
             out[pid].append(tid)
 
-    new_file = "TODO_pid_file.txt"
+    new_file = "outputs/TODO_pid_file.txt"
     output_file = open(new_file, "w")
     for (k, v) in out.iteritems():
         if (len(v) > 1):
