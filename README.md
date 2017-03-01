@@ -5,3 +5,5 @@
 Must be run in the scripts folder
 
 Outputs will be put in the 'outputs' folder
+
+More detailed information to come
