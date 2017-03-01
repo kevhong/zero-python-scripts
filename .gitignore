@@ -96,3 +96,6 @@ ENV/
 
 # Png graphs
 *.png
+
+# PyCharm
+.idea/*
