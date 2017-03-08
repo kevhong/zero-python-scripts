@@ -43,7 +43,7 @@ def _create_single_page_times_hist(fn, get_leaf, res_fn):
     fig = plt.figure()
     ax = fig.add_subplot(111)
     ax.hist(times, facecolor='green',
-            bins=[0, 25, 50, 75, 100,
+            bins=[0, 5, 10, 25, 50, 75, 100,
                   200, 300, 400, 500, 750, 1000])  # add labels?
     plt.xlabel('Buckets of Times (in Microseconds i.e. 10^-6 seconds)')
     plt.ylabel('Count')
@@ -81,7 +81,9 @@ def _create_xct_access_count_hist(fn, res_fn):
         for row in reader:
             if row[0] == 'NoTid':
                 no_tid = len(row) -1
-            counts.append(len(row) -1)
+            counts.append(len(set(row)) -1)
+            # if len(set(row)) > 10:
+            #     print set(row)
 
 
     counts = np.asarray(map(lambda x: np.float64(x), counts))
@@ -89,7 +91,8 @@ def _create_xct_access_count_hist(fn, res_fn):
     fig = plt.figure()
     ax = fig.add_subplot(111)
     ax.hist(counts, facecolor='blue',
-            bins=[0, 5, 10, 15, 20, 30, 40, 50, 100]) # add labels?
+            bins=[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
+                  13, 14, 15, 20, 30, 40, 50, 100]) # add labels?
     plt.xlabel('Page Access Number Bucket')
     plt.ylabel('Count of Transactions')
     plt.title('Histogram of Xct Page Access Counts')
@@ -118,14 +121,17 @@ def _create_page_access_count_hist(fn, res_fn):
         for row in reader:
             if row[0] == 'NoTid':
                 no_tid = len(row) - 1
-            counts.append(len(row) - 1)
+            counts.append(len(set(row)) - 1)
+            if len(set(row)) > 10:
+                print set(row)
 
     counts = np.asarray(map(lambda x: np.float64(x), counts))
 
     fig = plt.figure()
     ax = fig.add_subplot(111)
     ax.hist(counts, facecolor='red',
-            bins=[0, 5, 10, 15, 20, 30, 40, 50, 100])  # add labels?
+            bins=[0,1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
+                  13, 14, 15, 20, 30, 40, 50, 100])  # add labels?
     plt.xlabel('Xct Uses Number Bucket')
     plt.ylabel('Count of Pages')
     plt.title('Histogram of Page Usage Counts')
@@ -145,7 +151,6 @@ def _create_page_access_count_hist(fn, res_fn):
 # debug the missing NoTID
 
 if __name__ == '__main__':
-    print "done"
     # sp_recovery_info = os.path.join('test_data', 'restart',
     #                                 'single_page_recovery_info.txt')
     # sp_recovery_res = os.path.join('outputs', 'restart', '')

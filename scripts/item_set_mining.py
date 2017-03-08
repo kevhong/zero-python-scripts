@@ -20,11 +20,12 @@ def _load_page_id_set(pid_file):
 
 def frequent_item_set(patterns):
     relim_input = itemmining.get_relim_input(patterns)
-    report = itemmining.relim(relim_input, min_support=2)
+    report = itemmining.relim(relim_input, min_support=3)
     out = open('frequent_subset.txt', 'w+')
-    for (r, v) in report.iteritems():
+    for (r, v) in sorted(report.iteritems(), key=lambda x: x[1], reverse=True):
         if len(r) > 1:
-            out.write(str(r) + ":" + str(v) +  "\n")
+            to_w = list(r)
+            out.write(str(to_w) + ":" + str(v) +  "\n")
     out.close()
 
 def association_item_set(patterns):
@@ -32,11 +33,15 @@ def association_item_set(patterns):
     item_sets = itemmining.relim(relim_input, min_support=2)
     rules = assocrules.mine_assoc_rules(item_sets, min_support=2, min_confidence=0.5)
     out = open('association_subset.txt', 'w+')
-    for r in rules:
-        out.write(str(r) + "\n")
+    for r in sorted(rules, key=lambda x: x[2], reverse=True):
+        a = list(r[0])
+        b = list(r[1])
+        s = r[2]
+        c = r[3]
+        out.write(str(a) + "->" + str(b) + " ::  " + str(s) + ", " + str(c) +"\n")
     out.close()
 
 if __name__ == '__main__':
-    frequent_item_set(_load_page_id_set(page_id_info_all))
+    #frequent_item_set(_load_page_id_set(page_id_info_all))
     association_item_set(_load_page_id_set(page_id_info_all))
     print len(_load_page_id_set(page_id_info_all))
