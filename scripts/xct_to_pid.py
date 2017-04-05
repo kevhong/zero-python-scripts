@@ -93,7 +93,7 @@ def find_precent_recovered(sp_file, xct_file):
                     print "bug here !!"
                 else:
                     recovered_by[row[2]] = tid
-            else:
+            elif tid == 'NoTID':
                 restart.add(row[1])
 
     vals = []
@@ -124,7 +124,7 @@ def find_precent_recovered(sp_file, xct_file):
     out_test = open('test.txt', 'w+')
     out_test.write(
         reduce(lambda x, y: str(x) + ", " +  str(y),
-               ["TID", "Total Unique Pages Used", "SPR Recovered", "Times Used SPR", "Recovery Pages"]) + "\n")
+               ["TID", "Total Unique Pages Used", "SPR Recovered Pages Used", "Times Used SPR", "Restart Pages Used"]) + "\n")
     vals.sort(key=lambda x: float(x[0]))
     vals.insert(0, no_tid)
     for v in vals:
@@ -144,12 +144,13 @@ if __name__ == '__main__':
     # _create_pid_files(access_info_l, pid_res_fn_l)
     # _create_xct_files(access_info_l, xct_res_fn_l)
     #
-    # access_info_r = os.path.join('test_data', 'restart', 'page_fix_pid_info.txt')
-    # pid_res_fn_r = os.path.join('outputs', 'restart', 'pid_to_xct')
-    # xct_res_fn_r = os.path.join('outputs', 'restart', 'xct_to_pid')
-    #
-    # _create_pid_files(access_info_r, pid_res_fn_r)
-    # _create_xct_files(access_info_r, xct_res_fn_r)
+    access_info_r = os.path.join('test_data', 'restart', 'page_fix_pid_info.txt')
+    pid_res_fn_r = os.path.join('outputs', 'restart', 'pid_to_xct')
+    xct_res_fn_r = os.path.join('outputs', 'restart', 'xct_to_pid')
+
+    _create_pid_files(access_info_r, pid_res_fn_r)
+    _create_xct_files(access_info_r, xct_res_fn_r)
 
     find_precent_recovered(os.path.join('test_data', 'restart', 'single_page_recovery_info.txt'),
                            os.path.join('outputs', 'restart', 'xct_to_pid_multiple.txt'))
+    print "done\n"

@@ -123,7 +123,7 @@ def _create_page_access_count_hist(fn, res_fn):
                 no_tid = len(row) - 1
             counts.append(len(set(row)) - 1)
             if len(set(row)) > 10:
-                print set(row)
+                pass
 
     counts = np.asarray(map(lambda x: np.float64(x), counts))
 
