@@ -134,10 +134,9 @@ def find_precent_recovered(sp_file, xct_file):
     # find some type of window for when it was recovered (Find some precent)
 
 
-#TODO same page accessed over and over again
 
 if __name__ == '__main__':
-    access_info_l = os.path.join('test_data', 'load', 'page_fix_pid_info.txt')
+    access_info_l = os.path.join('test_data', 'load', 'page_fix_info.txt')
     pid_res_fn_l = os.path.join('outputs', 'load', 'pid_to_xct')
     xct_res_fn_l = os.path.join('outputs', 'load', 'xct_to_pid')
 
