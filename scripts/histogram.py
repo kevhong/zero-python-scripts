@@ -151,11 +151,11 @@ def _create_page_access_count_hist(fn, res_fn):
 # debug the missing NoTID
 
 if __name__ == '__main__':
-    # sp_recovery_info = os.path.join('test_data', 'restart',
-    #                                 'single_page_recovery_info.txt')
-    # sp_recovery_res = os.path.join('outputs', 'restart', '')
-    # _create_single_page_times_hist(sp_recovery_info, True, sp_recovery_res)
-    # _create_single_page_times_hist(sp_recovery_info, False, sp_recovery_res)
+    sp_recovery_info = os.path.join('test_data', 'restart',
+                                    'single_page_recovery_info.txt')
+    sp_recovery_res = os.path.join('outputs', 'restart', '')
+    _create_single_page_times_hist(sp_recovery_info, True, sp_recovery_res)
+    _create_single_page_times_hist(sp_recovery_info, False, sp_recovery_res)
 
     xct_info_l = os.path.join('outputs', 'load', 'xct_to_pid_all.txt')
     xct_out_l = os.path.join('outputs', 'load', '')

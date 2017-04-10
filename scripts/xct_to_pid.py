@@ -137,13 +137,13 @@ def find_precent_recovered(sp_file, xct_file):
 #TODO same page accessed over and over again
 
 if __name__ == '__main__':
-    # access_info_l = os.path.join('test_data', 'load', 'page_fix_pid_info.txt')
-    # pid_res_fn_l = os.path.join('outputs', 'load', 'pid_to_xct')
-    # xct_res_fn_l = os.path.join('outputs', 'load', 'xct_to_pid')
-    #
-    # _create_pid_files(access_info_l, pid_res_fn_l)
-    # _create_xct_files(access_info_l, xct_res_fn_l)
-    #
+    access_info_l = os.path.join('test_data', 'load', 'page_fix_pid_info.txt')
+    pid_res_fn_l = os.path.join('outputs', 'load', 'pid_to_xct')
+    xct_res_fn_l = os.path.join('outputs', 'load', 'xct_to_pid')
+
+    _create_pid_files(access_info_l, pid_res_fn_l)
+    _create_xct_files(access_info_l, xct_res_fn_l)
+
     access_info_r = os.path.join('test_data', 'restart', 'page_fix_pid_info.txt')
     pid_res_fn_r = os.path.join('outputs', 'restart', 'pid_to_xct')
     xct_res_fn_r = os.path.join('outputs', 'restart', 'xct_to_pid')
@@ -153,4 +153,3 @@ if __name__ == '__main__':
 
     find_precent_recovered(os.path.join('test_data', 'restart', 'single_page_recovery_info.txt'),
                            os.path.join('outputs', 'restart', 'xct_to_pid_multiple.txt'))
-    print "done\n"
