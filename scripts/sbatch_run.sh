@@ -11,7 +11,3 @@
 #SBATCH --ntasks=1
 #SBATCH --time=23:20:00
 
-
-python xct_to_pid.py
-python histogram.py
-python toSPMF.py

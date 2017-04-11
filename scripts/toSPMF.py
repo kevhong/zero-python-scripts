@@ -1,5 +1,5 @@
-import os
 import csv
+import sys
 
 
 def convert(pid_file, output_file):
@@ -18,5 +18,4 @@ def convert(pid_file, output_file):
 
 
 if __name__ == '__main__':
-    convert (os.path.join('outputs', 'restart', 'xct_to_pid_multiple.txt'),
-             'spmf.txt')
+    convert(sys.argv[1], 'spmf.txt')
