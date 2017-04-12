@@ -73,7 +73,8 @@ def _create_single_page_times_hist(fn, get_leaf, res_fn):
                                          if get_leaf
                                          else 'node_single_page_recovery.png')))
 
-
+# add flag for uniquness
+# add one for leaves vs. nodes
 def _create_xct_access_count_hist(fn, res_fn):
     counts = []
     with open(fn, 'rb') as csvfile:
@@ -99,7 +100,7 @@ def _create_xct_access_count_hist(fn, res_fn):
 
     more_than_one = len(filter(lambda x: x != 1, counts))
 
-    plt.figtext(0.5, 0.7,
+    plt.figtext(0.2, 0.7,
                 "Multiple: " + str(more_than_one) +
                 "\nSingle: " + str(len(counts) - more_than_one) +
                 "\nAverage: " + str(np.mean(counts)) +
@@ -157,22 +158,22 @@ if __name__ == '__main__':
     _create_single_page_times_hist(sp_recovery_info, True, sp_recovery_res)
     _create_single_page_times_hist(sp_recovery_info, False, sp_recovery_res)
 
-    xct_info_l = os.path.join('outputs', 'load', 'xct_to_pid_all.txt')
+    xct_info_l = os.path.join('test_data', 'load', 'xct_page_usage_info.txt')
     xct_out_l = os.path.join('outputs', 'load', '')
 
     _create_xct_access_count_hist(xct_info_l, xct_out_l)
 
-    xct_info_r = os.path.join('outputs', 'restart', 'xct_to_pid_all.txt')
+    xct_info_r = os.path.join('test_data', 'restart', 'xct_page_usage_info.txt')
     xct_out_r = os.path.join('outputs', 'restart', '')
 
     _create_xct_access_count_hist(xct_info_r, xct_out_r)
 
-    pid_info_l = os.path.join('outputs', 'load', 'pid_to_xct_all.txt')
-    pid_out_l = os.path.join('outputs', 'load', '')
-
-    _create_page_access_count_hist(pid_info_l, pid_out_l)
-
-    pid_info_r = os.path.join('outputs', 'restart', 'pid_to_xct_all.txt')
-    pid_out_r = os.path.join('outputs', 'restart', '')
-
-    _create_page_access_count_hist(pid_info_r, pid_out_r)
+    # pid_info_l = os.path.join('outputs', 'load', 'pid_to_xct_all.txt')
+    # pid_out_l = os.path.join('outputs', 'load', '')
+    #
+    # _create_page_access_count_hist(pid_info_l, pid_out_l)
+    #
+    # pid_info_r = os.path.join('outputs', 'restart', 'pid_to_xct_all.txt')
+    # pid_out_r = os.path.join('outputs', 'restart', '')
+    #
+    # _create_page_access_count_hist(pid_info_r, pid_out_r)
