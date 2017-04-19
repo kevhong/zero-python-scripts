@@ -1,14 +1,17 @@
 import os
 import numpy as np
 import csv
+import pickle
 
 import predict_utils
 
 from collections import defaultdict
 
 
+
+
 def train_model(src, minsup, minconf):
-    out_fn = os.path.basename(src).split(".")[0] + "_assocRules.txt"
+    out_fn = os.path.basename(src).split(".")[0] + "_assocRules_%d_%d.txt" % (minsup, minconf)
     to_run =  'java -Xmx8192m  -jar spmf.jar run FPGrowth_association_rules %s %s %d%% %d%%' % \
               (src, out_fn, minsup, minconf)
     print to_run
@@ -16,10 +19,8 @@ def train_model(src, minsup, minconf):
     return out_fn
 
 
-def evaluate(rules_file, test_file,
-             dest_file='spm.txt', eval_point=5,
-             groupBy=1,
-             verbose=False):
+def create_dict(rules_file):
+    out_fn = os.path.basename(rules_file).split(".")[0] + "_pickle.txt"
     rules_dic = defaultdict(list)
     with open(rules_file, 'rb') as rules:
         for row in rules:
@@ -33,6 +34,22 @@ def evaluate(rules_file, test_file,
             except:
                 continue
 
+    with open(out_fn, 'wb') as handle:
+        pickle.dump(rules_dic, handle)
+
+    return out_fn, rules_dic
+
+
+def evaluate(rules_dic, rules_file, test_file,
+             dest_file='spm.txt', eval_point=5,
+             groupBy=1,
+             verbose=False):
+
+    # out_fn = os.path.basename(rules_file).split(".")[0] + "_pickle.txt"
+    #
+    # rules_dic = {}
+    # with open(out_fn, 'rb') as handle:
+    #     rules_dic = pickle.loads(handle.read())
 
     temp_file = create_grouping(test_file, groupBy)
 
@@ -66,7 +83,9 @@ def evaluate(rules_file, test_file,
                 for p in possible:
                     if p in to_guess:
                         found += 1
-                stats.append((float(found), len(to_guess), len(possible) - found, float(found)/len(to_guess)))
+                stats.append((found, len(to_guess),
+                             len(possible) - found,
+                             float(found)/len(to_guess)))
 
 
     t_found = 0
@@ -83,7 +102,7 @@ def evaluate(rules_file, test_file,
 
     dest = open(dest_file, 'a')
     dest.write("--"*50 + "\n")
-    dest.write("Run Config\n Rules File: %s\n Test File: %s\n Eval_Point: %d\n GroupedBy: %d\n"
+    dest.write("Run Config\n Rules File: %s\n Test File: %s\n Eval_Point: %d\n Xct in a Group: %d\n"
                % (rules_file, test_file, eval_point, groupBy))
     dest.write("Unique pages: %d\n" % (len(unique_pages)))
     dest.write("Run Result\n "
@@ -132,30 +151,48 @@ def create_grouping(src, groupBy = 1):
 if __name__ == '__main__':
     # test, train = predict_utils.split_file("spmf_run3.txt", 0.5)
 
-    for y in range(1, 10, 2):
+    model_conf = [(0,0), (20, 35), (30, 45), (37, 53), (45, 60)]
+
+    for y in range(2, 5, 1):
         train_grouped = create_grouping('spmf_run3_train_0.50.txt', y)
-        model = train_model(train_grouped, 20, 35)
+        model = train_model(train_grouped, model_conf[y][0], model_conf[y][1])
+        p_fn, rules_dict = create_dict(model)
         for x in xrange(1, 10, 2):
-            evaluate('spmf_run3_train_0_groupedBy_1_assocRules.txt', 'spmf_run3_test_0.50.txt',
-                     dest_file='spmf_run3_eval.txt',
+            evaluate(rules_dict, model, 'spmf_run3_test_0.50.txt',
+                     dest_file='spmf_run3_eval_new.txt',
                      eval_point = 5, groupBy=x)
-            print "finished eval for groupBy %d"  % x
-        os.system('rm %s' % (model))
-        os.remove('rm %s' % train_grouped)
+            print "finished eval for xct group by %d"  % x
+        try:
+            os.system('rm %s' % (model))
+            os.system('rm %s' % (p_fn))
+            os.remove('rm %s' % (train_grouped))
+        except Exception as inst:
+            print inst 
+            continue
 
-    for y in range(1, 10, 5):
-        train_grouped = create_grouping('spmf_run3_train_0.50.txt', 1)
-        model = train_model(train_grouped, 20, 35)
+
+    for y in range(1, 5, 1):
+        if (y - 1) * 20 + 35 > 100:
+            break
+        train_grouped = create_grouping('spmf_run3_train_0.50.txt', y)
+        model = train_model(train_grouped, 20 + (y - 1) * 20, 35 + (y - 1) * 20)
+        p_fn, rules_dict = create_dict(model)
         for x in xrange(1, 10, 5):
-            evaluate('spmf_run3_train_0_groupedBy_1_assocRules.txt', 'spmf_run3_test_0.50.txt',
-                     dest_file = 'spmf_run3_eval_verbose.txt',
+            evaluate(rules_dict, model, 'spmf_run3_test_0.50.txt',
+                     dest_file = 'spmf_run3_eval_verbose_new.txt',
                      eval_point=5, groupBy=x, verbose=True)
-            print "finished eval for groupBy %d" % x
-        os.system('rm %s' % (model))
-        os.remove('rm %s' % train_grouped)
+            print "finished eval for xct grouped by %d" % x
+        try:
+            os.system('rm %s' % (model))
+            os.system('rm %s' % (p_fn))
+            os.remove('rm %s' % (train_grouped))
+        except Exception as inst:
+            print inst
+            continue
 
-    # train_grouped = create_grouping('spmf_run3_train_0.50.txt', y)
+    # train_grouped = create_grouping('spmf_run3_train_0.50.txt', 1)
     # model = train_model(train_grouped, 20, 35)
-    # evaluate('spmf_run3_train_0_groupedBy_1_assocRules.txt', 'spmf_run3_test_0.50.txt',
+    # p_fn, rules_dict = create_dict(model)
+    # evaluate(rules_dict, model, 'spmf_run3_test_0.50.txt',
     #          dest_file='demo.txt',
     #          eval_point=5, groupBy=1)

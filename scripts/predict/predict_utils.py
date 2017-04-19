@@ -3,8 +3,8 @@ import os
 
 
 def split_file(src, cutoff):
-    test_fn = os.path.basename(src).split(".")[0] + "_test_%.2f.txt" % (cutoff)
-    train_fn = os.path.basename(src).split(".")[0] + "_train_%.2f.txt" % (cutoff)
+    test_fn = os.path.basename(src).split(".")[0] + "_test_%d.txt" % (cutoff*100)
+    train_fn = os.path.basename(src).split(".")[0] + "_train_%d.txt" % (cutoff*100)
 
     with open(src, 'rb') as src_file, open(test_fn, 'w') as test_file, \
             open(train_fn, 'w') as train_file:
