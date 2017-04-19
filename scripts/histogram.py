@@ -60,12 +60,17 @@ def _create_single_page_times_hist(fn, get_leaf, res_fn):
     restart_thread_pages_var = np.var(times)
 
     plt.figtext(0.175, 0.7,
-                "Total Pages: " + str(total_pages) + "\n" +
-                "Total Average: " + str(overall_average) + "\n" +
-                "Total Variance: " + str(overall_var) + "\n\n" +
-                "NoTID Pages: " + str(restart_thread_pages) + "\n" +
-                "NoTID Average: " + str(restart_thread_pages_avg) + "\n" +
-                "NoTID Variance: " + str(restart_thread_pages_var),
+                "Total Pages: %d\n"
+                "Total Average:  %.2f\n"
+                "Total Variance: "
+                "%.2f\n\nNoTID Pages: %d\n "
+                "NoTID Average: %.2f\n NoTID "
+                "Variance: %.2f\n" % (total_pages,
+                                      overall_average,
+                                      overall_var,
+                                      restart_thread_pages,
+                                      restart_thread_pages_avg,
+                                      restart_thread_pages_var),
                 fontsize=9)
 
 
@@ -93,18 +98,19 @@ def _create_xct_access_count_hist(fn, res_fn):
     ax = fig.add_subplot(111)
     ax.hist(counts, facecolor='blue',
             bins=[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
-                  13, 14, 15, 20, 30, 40, 50, 100]) # add labels?
+                  13, 14, 15, 20, 30, 40, 50,
+                  60, 70, 80, 90, 100]) # add labels?
     plt.xlabel('Page Access Number Bucket')
     plt.ylabel('Count of Transactions')
-    plt.title('Histogram of Xct Page Access Counts')
+    plt.title('Histogram of Xct Unique Page Access Counts')
 
     more_than_one = len(filter(lambda x: x != 1, counts))
 
     plt.figtext(0.2, 0.7,
-                "Multiple: " + str(more_than_one) +
-                "\nSingle: " + str(len(counts) - more_than_one) +
-                "\nAverage: " + str(np.mean(counts)) +
-                "\nPrecent Multiple: " + str(float(more_than_one) / len(counts)),
+                "Multiple: %d\nSingle: %d\nAverage: %.2f \nPrecent Multiple: %.2f" %
+                (more_than_one,
+                 len(counts) - more_than_one, 34,
+                 float(more_than_one) / len(counts)),
                 fontsize=12)
 
     # plt.figtext(0.5, 0.7,
@@ -140,10 +146,10 @@ def _create_page_access_count_hist(fn, res_fn):
     more_than_one = len(filter (lambda x: x != 1, counts))
 
     plt.figtext(0.5, 0.7,
-                "Multiple: " + str(more_than_one) +
-                "\nSingle: " + str(len(counts) - more_than_one) +
-                "\nAverage: " + str(np.mean(counts)) +
-                "\nPrecent Multiple: " + str(float(more_than_one) / len(counts)),
+                "Multiple: %d\nSingle: %d\nAverage: %.2f \nPrecent Multiple: %.2f" %
+                (more_than_one,
+                 len(counts) - more_than_one, 34,
+                float(more_than_one) / len(counts)),
                 fontsize=12)
 
     plt.savefig("{0}{1}".format(res_fn, 'page_access_hist.png'))

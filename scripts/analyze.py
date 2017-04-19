@@ -53,7 +53,10 @@ def find_percent_recovered(sp_file, xct_file):
     out_test = open('percent_recovered.txt', 'w+')
     out_test.write(
         reduce(lambda x, y: str(x) + ", " +  str(y),
-               ["TID", "Total Unique Pages Used", "SPR Recovered Pages Used", "Times Used SPR", "Restart Pages Used"]) + "\n")
+               ["TID", "Total Unique Pages Used",
+                "SPR Recovered Pages Used",
+                "Times Used SPR",
+                "Restart Pages Used"]) + "\n")
     vals.sort(key=lambda x: float(x[0]))
     vals.insert(0, ('NoTID', len(restart)))
     for v in vals:
