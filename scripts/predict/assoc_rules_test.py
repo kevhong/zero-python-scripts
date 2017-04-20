@@ -3,6 +3,8 @@ import numpy as np
 import csv
 import pickle
 
+import sys
+
 import itertools
 
 import predict_utils
@@ -13,10 +15,11 @@ from collections import defaultdict
 def train_model(src, minsup, minconf):
     out_fn = os.path.join('exp_files',
                           os.path.basename(src).split(".")[0] + "_assocRules_%d_%d.txt" % (minsup, minconf))
-    to_run = 'java -Xmx8192m  -jar spmf.jar run MNR %s %s %d%% %d%%' % \
-             (src, out_fn, minsup, minconf)
-    print to_run
-    os.system(to_run)
+    if not os.path.isfile(out_fn):
+        to_run = 'java -Xmx8192m  -jar spmf.jar run MNR %s %s %d%% %d%%' % \
+                 (src, out_fn, minsup, minconf)
+        print to_run
+        os.system(to_run)
     return out_fn
 
 
@@ -28,23 +31,24 @@ def create_dict(rules_file):
     with open(rules_file, 'rb') as rules:
         for row in rules:
             parsed = row.split(" ==>")
-            print row
+            # print row
             key = reduce(lambda x, y: "%s %d" % (x, y),
                          sorted(map(lambda x: int(x),
                                     parsed[0].strip().split(" "))),
                          "").strip()
-            #print key
+            # print key
             val = reduce(lambda x, y: "%s %d" % (x, y),
                          sorted(map(lambda x: int(x),
                                     parsed[1][0:parsed[1].find("#SUP:")].strip().split(" "))),
                          "").strip()
-            #print val
+            # print val
             conf = float(parsed[1].split(" ")[-1])
-            #print conf
+            # print conf
             rules_dic[key].append((val, conf))
 
-    with open(out_fn, 'wb') as handle:
-        pickle.dump(rules_dic, handle)
+    if not os.path.isfile(out_fn):
+        with open(out_fn, 'wb') as handle:
+            pickle.dump(rules_dic, handle)
 
     return rules_dic
 
@@ -56,6 +60,13 @@ def evaluate(rules_file, test_file, train_amt, rules_dic={},
              groupBy=1,
              min_conf=0.35,
              verbose=False):
+
+    stat_fN = os.path.join("logged",
+                      os.path.basename(rules_file).split(".")[0] +
+                           '_results_{:d}_{:d}_{:d}.txt'.format(groupBy, eval_point, int(100*min_conf)))
+
+    if os.path.isfile(stat_fN):
+        return
 
     r_f = os.path.join('exp_files',
                        os.path.basename(rules_file).split(".")[0] + "_pickle.txt")
@@ -125,13 +136,7 @@ def evaluate(rules_file, test_file, train_amt, rules_dic={},
                               len(guesses),
                               len(unknown),
                               precision,
-                              recall))
-
-
-    stat_fN = os.path.join("logged",
-                      os.path.basename(rules_file).split(".")[0] +
-                           '_results_{:d}_{:d}_{:d}.txt'.format(groupBy, eval_point, int(100*min_conf)))
-
+                              recall, row.strip()))
 
     with open(stat_fN, 'wb') as csvfile:
         s_writer = csv.writer(csvfile, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
@@ -163,7 +168,7 @@ def evaluate(rules_file, test_file, train_amt, rules_dic={},
     avg_precision, var_precision = find_avg_and_var(3)
     avg_recall, var_recall = find_avg_and_var(4)
 
-    os.system('rm %s' % (temp_file))
+    os.system('rm %s' % temp_file)
 
     dest = open(dest_file, 'a')
     dest.write("--" * 50 + "\n")
@@ -254,6 +259,9 @@ def create_grouping(src, groupBy=1):
     out_fn = os.path.join('exp_files',
                           os.path.basename(src).split(".")[0] + "_groupedBy_%d.txt" % (groupBy))
 
+    if os.path.isfile(out_fn):
+        return out_fn
+
     with open(src, 'rb') as src_file, open(out_fn, 'w') as out_file:
         reader = csv.reader(src_file, delimiter=' ', quotechar='|')
         count = 0
@@ -283,7 +291,7 @@ if __name__ == '__main__':
     #
 
     # print 'Starting Run on SPMF_run3'
-    # for test_part in [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]:
+    # for test_part in [0.7, 0.8]:
     #     test, train = predict_utils.split_file("spmf_run3.txt", test_part)
     #     if test_part == 0:
     #         test = train
@@ -293,9 +301,9 @@ if __name__ == '__main__':
     #     model = train_model(train_grouped, 20, 30)
     #     rules_dict = create_dict(model)
     #
-    #     for g_B in range(1, 6):
-    #         for e_points in xrange(3, 8):
-    #             for m_conf in [0.1, 0.2, 0.25, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.95]:
+    #     for g_B in [1]:
+    #         for e_points in [5]:
+    #             for m_conf in [0.3, 0.5]:
     #                 evaluate(model,
     #                          test, int(100 * (1 - test_part)),
     #                          rules_dic = rules_dict,
@@ -309,25 +317,31 @@ if __name__ == '__main__':
 
     # Server
     print 'Starting Run on SPMF_run3'
-    for test_part in [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]:
+    try:
+        m_sup_s = int(sys.argv[1])
+        m_conf_s = int(sys.argv[2])
+    except:
+        m_sup_s = 20
+        m_conf_s = 30
+    for test_part in [0, 0.2, 0.4, 0.5, 0.7, 0.8]:
         test, train = predict_utils.split_file("spmf_run3.txt", test_part)
         if test_part == 0:
             test = train
 
         train_grouped = create_grouping(train, 1)
 
-        model = train_model(train_grouped, 5, 9)
+        model = train_model(train_grouped, m_sup_s, m_conf_s)
         rules_dict = create_dict(model)
 
         for g_B in range(1, 6):
             for e_points in xrange(3, 8):
-                for m_conf in [0.1, 0.15, 0.2, 0.25, 0.35,
-                               0.4, 0.45, 0.5, 0.55, 0.60, 0.65, 0.7, 0.75, 0.8, 0.85, 0.95]:
+                for m_conf in [0.2, 0.3,
+                               0.4, 0.5, 0.60, 0.7, 0.8, 0.9]:
                     evaluate(model,
                              test, int(100 * (1 - test_part)),
                              rules_dic=rules_dict,
-                             dest_file='spmf_run3_full.txt',
-                             dest_log='spmf_run3_log.txt',
+                             dest_file='spmf_run3_full_%d_%d.txt' % (m_sup_s, m_conf_s),
+                             dest_log='spmf_run3_log_%d_%d.txt' % (m_sup_s, m_conf_s),
                              eval_point=e_points,
                              groupBy=g_B,
                              min_conf=m_conf)
